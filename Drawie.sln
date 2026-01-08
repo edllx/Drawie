@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drawie", "Drawie\Drawie.csproj", "{1FC3E1AC-A2A4-4D38-BEB7-2081059DE77A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "demo", "demo\demo.csproj", "{9557D73C-B388-4B20-903A-47C09FE0C8A3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1FC3E1AC-A2A4-4D38-BEB7-2081059DE77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FC3E1AC-A2A4-4D38-BEB7-2081059DE77A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FC3E1AC-A2A4-4D38-BEB7-2081059DE77A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FC3E1AC-A2A4-4D38-BEB7-2081059DE77A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9557D73C-B388-4B20-903A-47C09FE0C8A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9557D73C-B388-4B20-903A-47C09FE0C8A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9557D73C-B388-4B20-903A-47C09FE0C8A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9557D73C-B388-4B20-903A-47C09FE0C8A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
