@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Drawie;
 
 public interface ICommand
@@ -18,6 +20,40 @@ public class Command(Func<Task> action) : ICommand
     public async Task ExecuteAsync()
     {
         await action.Invoke();
+    }
+}
+
+internal static class IdGenerator
+{
+    private static string _alphaNum = "abcdefghijklmnopkrstuvwxyz0123456789";
+
+    public static string GenerateRandomString(int len, string prefix = "", int? seed = null)
+    {
+        StringBuilder builder = new();
+        Random r = new Random();
+
+        if (seed is not null && seed.Value >= 0 && seed.Value <= int.MaxValue)
+        {
+            r = new(seed.Value);
+        }
+        else
+        {
+            r = Random.Shared;
+        }
+
+        int i = 0;
+        for (; i < prefix.Length && i < len; i++)
+        {
+            builder.Append(prefix[i]);
+        }
+
+        for (; i < len; i++)
+        {
+            var pick = r.Next(_alphaNum.Length);
+            builder.Append(_alphaNum[pick]);
+        }
+
+        return builder.ToString();
     }
 }
 

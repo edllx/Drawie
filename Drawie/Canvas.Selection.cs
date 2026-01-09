@@ -6,13 +6,13 @@ namespace Drawie;
 public partial class Canvas
 {
     private static readonly IPen SelectionPen = new Pen(Brushes.Crimson, 1);
-    public Selection Selection { get; }
+    internal Selection Selection { get; }
 
     public void ClearSelection()
     {
         foreach (var nd in _nodes)
         {
-            nd.Selected = false;
+            nd.Value.Selected = false;
         }
 
         Selection.Nodes.Clear();
@@ -38,7 +38,7 @@ public partial class Canvas
     }
 }
 
-public class Selection()
+internal class Selection()
 {
     public event Action<Point, Point>? OnBoundChange;
     public Point TopLeft { get; set; }

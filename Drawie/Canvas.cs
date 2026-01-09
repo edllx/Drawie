@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using Avalonia;
@@ -7,13 +9,19 @@ using Avalonia.Media;
 
 namespace Drawie;
 
-public interface ICanvas
+internal interface ICanvas
 {
     INode? GetNode(string id);
     INode? GetHittingNode(Point p);
 
     event Action<double> OnZoomChanged;
     event Action<Vector> OnOffsetChanged;
+    
+    
+    void AddNode(INode node, bool replace =false);
+    void AddNode(INode[] nodes,bool replace =false);
+    void RemoveNode(string id);  
+    
 }
 
 public partial class Canvas : Control, ICanvas
@@ -25,6 +33,8 @@ public partial class Canvas : Control, ICanvas
     public event Action<double>? OnZoomChanged;
     public event Action<Vector>? OnOffsetChanged;
 
+    
+
     private Stopwatch _renderStopwatch = new Stopwatch();
     private Stopwatch _cacheStopwatch = new Stopwatch();
     private long _lastRenderTimeMs = 0;
@@ -34,7 +44,14 @@ public partial class Canvas : Control, ICanvas
     private bool _useCache = true;
     
     public static readonly StyledProperty<bool> ShowStatProperty = AvaloniaProperty.Register<Canvas, bool>(
-        nameof(ShowStatProperty));
+        nameof(ShowStat));
+    
+    public static readonly StyledProperty<GridType> GridTypeProperty = AvaloniaProperty.Register<Canvas, GridType>(
+        nameof(GridType),defaultValue:GridType.None);
+
+
+    private ObservableCollection<int> col = [];
+    
 
     public bool ShowStat
     {
@@ -42,14 +59,19 @@ public partial class Canvas : Control, ICanvas
         set => SetValue(ShowStatProperty, value);
     }
 
-    public double Zoom { get; private set; } = 1;
-    public Vector PanOffset { get; private set; } = new Vector(0, 0);
-    public Point LastMousePressedPosition { get; private set; }
+    public GridType GridType
+    {
+        get => GetValue(GridTypeProperty);
+        set => SetValue(GridTypeProperty, value);
+    }
 
-    private readonly List<INode> _nodes = [];
+    public double Zoom { get; private set; } = 1;
+    internal Vector PanOffset { get; private set; } = new Vector(0, 0); 
+    internal Point LastMousePressedPosition { get; private set; }
+
+    //private readonly List<INode> _nodes = [];
     private readonly List<NodeLink> _nodeLinks = [];
 
-    public INode[] Nodes => _nodes.ToArray();
 
     public Canvas()
     {
@@ -198,27 +220,5 @@ public partial class Canvas : Control, ICanvas
         return (p + PanOffset) * Zoom;
     }
 
-    public INode? GetNode(string? id)
-    {
-        if (id is null)
-        {
-            return null;
-        }
-
-        return _nodes.Find(v => v.Id == id);
-    }
-
-    public INode? GetHittingNode(Point p)
-    {
-        for (int i = 0; i < _nodes.Count; i++)
-        {
-            var node = _nodes[i];
-            if (node.Contains(p))
-            {
-                return node;
-            }
-        }
-
-        return null;
-    }
+    
 }

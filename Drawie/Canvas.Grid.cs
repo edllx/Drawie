@@ -11,7 +11,6 @@ public enum GridType
 
 public partial class Canvas
 {
-    public GridType GridType = GridType.None;
     private static readonly IPen MinorGridPen = new Pen(
         new SolidColorBrush(Color.FromArgb(40, 11, 11, 11)),
         1

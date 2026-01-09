@@ -5,32 +5,83 @@ namespace Drawie;
 
 public partial class Canvas
 {
+    private readonly Dictionary<string,INode> _nodes = [];
+    // Setup Selection dragging
+    // Setup Selection dragging
+
+    public INode[] Nodes => _nodes.Values.ToArray();
+    
+    private bool AddN(INode node,bool replace = false)
+    {
+        var contain = _nodes.ContainsKey(node.Id);
+        if (contain && !replace)
+        {
+            return false;
+        }
+
+        if (contain)
+        {
+            _nodes[node.Id] = node;
+            return true;
+        }
+        
+        _nodes.Add(node.Id, node);
+        
+        return true;
+    }
+    
+    public void AddNode(INode node, bool replace = false)
+    {
+        if (node is Node nd)
+        {
+            nd.Canvas = this;
+        }
+        
+        
+        if (!AddN(node, replace: replace)){return;} 
+        Refrech();
+    }
+
+    public void AddNode(INode[] nodes,bool replace =false)
+    {
+        Refrech();
+    }
+
+    public void UpdateNode(INode node,bool create=false)
+    {
+        Refrech();
+    }
+
+    public void RemoveNode(string id)
+    {
+        Refrech();
+    }
+    
     public INode? GetNodeAt(Point point)
     {
         var worldPoint = ScreenToWorld(point);
 
-        for (int i = _nodes.Count - 1; i >= 0; i--)
+        foreach (var node in _nodes)
         {
-            INode node = _nodes[i];
-            if (node.Contains(worldPoint))
+            if (node.Value.Contains(worldPoint))
             {
-                return node;
+                return node.Value;
             }
+           
         }
+        
         return null;
     }
 
     private void DrawNodes(DrawingContext context)
     {
-        for (int i = 0; i < _nodes.Count; i++)
+        foreach (var node in _nodes)
         {
-            var nd = _nodes[i];
-            if (IsNodeOffBound(nd))
+            if (IsNodeOffBound(node.Value))
             {
                 continue;
             }
-
-            nd.Render(context);
+            node.Value.Render(context);
         }
     }
 
@@ -56,7 +107,6 @@ public partial class Canvas
 
     private bool IsNodeOffBound(INode nd)
     {
-        //Console.WriteLine(nd.Bounds);
         var isOffRight = nd.Bounds.TopLeft.X > Bounds.Width / Zoom - PanOffset.X;
         var isOffBot = nd.Bounds.TopLeft.Y > Bounds.Height / Zoom - PanOffset.Y;
 
@@ -64,5 +114,28 @@ public partial class Canvas
         var isOffLeft = nd.Bounds.BottomRight.X < -PanOffset.X;
 
         return isOffBot || isOffRight || isOffLeft || isOffTop;
+    }
+    
+    public INode? GetNode(string? id)
+    {
+        if (id is null)
+        {
+            return null;
+        }
+
+        return _nodes[id];
+    }
+    public INode? GetHittingNode(Point p)
+    {
+        foreach (var node in _nodes)
+        {
+            if (node.Value.Contains(p))
+            {
+                return node.Value;
+            }
+           
+        }
+
+        return null;
     }
 }

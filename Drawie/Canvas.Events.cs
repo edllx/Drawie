@@ -3,7 +3,7 @@ using Avalonia.Input;
 
 namespace Drawie;
 
-public partial class CanvasPointerEventHandler
+internal partial class CanvasPointerEventHandler
 {
     private Canvas _canvas;
 
@@ -20,8 +20,7 @@ public partial class CanvasPointerEventHandler
         }
 
         var worldPoint = _canvas.ScreenToWorld(_canvas.LastMousePressedPosition);
-        // Clicking selection area
-        // Setup Selection dragging
+
         if (_canvas.Selection.Contains(worldPoint))
         {
             _canvas.Selection.Dragging = true;
@@ -97,19 +96,18 @@ public partial class CanvasPointerEventHandler
             return this;
         }
 
-        // Set the seleciton end on cell further
         var br = Canvas.GetOrigin(_canvas.ScreenToWorld(position)) + new Point(1, 1);
 
         _canvas.Selection.BotRight = br;
 
-        foreach (Node nd in _canvas.Nodes)
+        foreach (INode node in _canvas.Nodes)
         {
             if (
-                _canvas.Selection.Contains(nd.Bounds.BottomRight)
-                && _canvas.Selection.Contains(nd.Bounds.TopLeft)
+                _canvas.Selection.Contains(node.Bounds.BottomRight)
+                && _canvas.Selection.Contains(node.Bounds.TopLeft)
             )
             {
-                _canvas.Selection.AddNode(nd, adjustBounds: false);
+                _canvas.Selection.AddNode(node, adjustBounds: false);
             }
         }
         _canvas.Selection.NotityBoundChanged();
