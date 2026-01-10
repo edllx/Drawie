@@ -39,13 +39,9 @@ public class TextNode : Node
         {
             return;
         }
-        //Console.WriteLine($"{Content}");
-
         Dirty = false;
 
         using var ctx = DrawingGroup.Open();
-        //double availableSpaceX = Size.Width - (Padding.Left + Padding.Right);
-        //double availableSpaceY = Size.Height - (Padding.Top + Padding.Bottom);
         
         var info = new FormattedText(
             Content,
@@ -69,7 +65,7 @@ public class TextNode : Node
 
     public override void Render(DrawingContext ctx)
     {
-        //Draw();
+        Draw();
         DrawingGroup.Draw(ctx);
     }
 
@@ -83,10 +79,10 @@ public class TextNode : Node
         switch (propertyName)
         {
             case nameof(Origin):
-                Draw(true);
+                Dirty = true;
                 break;
             case nameof(Content):
-                Draw(true);
+                Dirty = true;
                 break;
         }
     }

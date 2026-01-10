@@ -106,16 +106,19 @@ public class TaskNode : Node
         {
             case nameof(Title):
                 TitleNode.Content = Title;
+                Canvas?.Refrech();
                 break;
             case nameof(Desctiption):
                 DescriptionNode.Content = Desctiption;
+                Canvas?.Refrech();
                 break;
-            case  nameof(Selected):
+            case nameof(Selected):
                 Body.Selected = Selected;
                 break;
             case  nameof(Origin):
                 Body.Origin = Origin;
                 break;
         }
+        base.OnPropertyChanged(propertyName);
     }
 }

@@ -17,10 +17,14 @@ internal interface ICanvas
     event Action<double> OnZoomChanged;
     event Action<Vector> OnOffsetChanged;
     
-    
     void AddNode(INode node, bool replace =false);
-    void AddNode(INode[] nodes,bool replace =false);
+    void AddNode(IEnumerable<INode> nodes,bool replace =false,bool clear=false);
     void RemoveNode(string id);  
+    void RemoveNode(Predicate<INode> predicate);
+    
+    void AddNodeLink(string fromId, string toId,string? id =null);
+    void RemoveNodeLink(string id);
+    void RemoveNodeLink(Predicate<NodeLink> predicate);
     
 }
 
@@ -70,7 +74,7 @@ public partial class Canvas : Control, ICanvas
     internal Point LastMousePressedPosition { get; private set; }
 
     //private readonly List<INode> _nodes = [];
-    private readonly List<NodeLink> _nodeLinks = [];
+    //private readonly List<NodeLink> _nodeLinks = [];
 
 
     public Canvas()

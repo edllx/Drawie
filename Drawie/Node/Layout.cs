@@ -4,6 +4,19 @@ using Avalonia.Media;
 
 namespace Drawie;
 
+
+public enum LayoutType
+{
+    Flex,
+}
+
+public enum LayoutDirection
+{
+    Vertical,
+    Horizontal,
+}
+
+
 public class LayoutNode : Container
 {
     public LayoutType Type = LayoutType.Flex;

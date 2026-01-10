@@ -89,7 +89,6 @@ public partial class Canvas
             {
                 for (double y = startY; y < Bounds.Height / Zoom - PanOffset.Y; y += spacing)
                 {
-                    // Draw each dot as a tiny rectangle (more efficient than ellipse)
                     ct.BeginFigure(new Point(x - 0.5, y - 0.5), true);
                     ct.LineTo(new Point(x + 0.5, y - 0.5));
                     ct.LineTo(new Point(x + 0.5, y + 0.5));
