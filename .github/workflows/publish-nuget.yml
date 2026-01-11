@@ -1,0 +1,102 @@
+name: Publish NuGet
+
+on:
+  push:
+    branches: [ main ]  # Trigger on commits to main (to auto-tag)
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.extract_bump.outputs.SKIP_BUMP }}
+      bump_type: ${{ steps.extract_bump.outputs.BUMP_TYPE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for Git history
+
+      - name: Extract Bump Type
+        id: extract_bump
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" =~ \[Version:(major|minor|patch)\] ]]; then
+            echo "BUMP_TYPE=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else
+            echo "SKIP_BUMP=true" >> $GITHUB_OUTPUT
+            echo "::notice::No version bump requested"
+          fi
+  test:
+    needs: check
+    if: ${{ !needs.check.outputs.should_skip }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for Git history
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'  
+
+      - name: Launch tests
+        run: dotnet test __tests__/
+
+
+  push-verion:
+    needs: [check,test]
+    if: ${{ !needs.check.outputs.should_skip }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    
+
+      - name: Cache semver-tool
+        id: cache-semver
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/bin/semver
+          key: semver-tool-1.0.0
+
+      - name: Install semver-tool (if not cached)
+        if: steps.cache-semver.outputs.cache-hit != 'true'
+        run: |
+          curl -sLo /usr/local/bin/semver \
+            https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver
+          chmod +x /usr/local/bin/semver
+
+      # Step added: Setup .NET SDK before using dotnet commands
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'  # Or your target version
+
+      - name: Get Latest Tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          echo "CURRENT_VERSION=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Calculate Version
+        id: bump_version
+        run: |
+          NEW_VERSION=$(semver bump ${{ needs.check.outputs.bump_type }} ${{ steps.get_tag.outputs.CURRENT_VERSION }})
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build and Pack
+        run: |
+          dotnet build -c Release
+          dotnet pack -c Release -p:PackageVersion=${{ steps.bump_version.outputs.NEW_VERSION }} --output ./nupkg
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+      - name: Create and Push Tag
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a "v${{ steps.bump_version.outputs.NEW_VERSION }}" -m "Version ${{ steps.bump_version.outputs.NEW_VERSION }}"
+          git push origin "v${{ steps.bump_version.outputs.NEW_VERSION }}"
