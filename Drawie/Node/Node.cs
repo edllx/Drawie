@@ -112,6 +112,8 @@ public abstract class Node : INode
 
     public virtual void Drag(Point position)
     {
+        if(!Draggable){return;}
+        
         Offset += position;
         var pp = DragOrigin + Offset;
         var newOrigin = Canvas.GetOrigin(pp);
@@ -121,7 +123,7 @@ public abstract class Node : INode
 
     public virtual void Move(Vector vect)
     {
-        if (vect.Equals(new(0, 0)))
+        if (!Draggable || vect.Equals(new(0, 0)))
         {
             return;
         }

@@ -8,7 +8,7 @@ public partial class Canvas
     private static readonly IPen SelectionPen = new Pen(Brushes.Crimson, 1);
     internal Selection Selection { get; }
 
-    public void ClearSelection()
+    internal void ClearSelection()
     {
         foreach (var nd in _nodes)
         {
@@ -79,22 +79,6 @@ internal class Selection()
         return position.X >= x1 && position.X <= x2 && position.Y >= y1 && position.Y <= y2;
     }
 
-    /*
-    public bool ContainsWorld(Point position)
-    {
-        var m = Canvas.GridSize;
-        var x1 = Math.Min(TopLeft.X, BotRight.X);
-        var x2 = Math.Max(TopLeft.X, BotRight.X);
-
-        var y1 = Math.Min(TopLeft.Y, BotRight.Y);
-        var y2 = Math.Max(TopLeft.Y, BotRight.Y);
-        return position.X >= x1 * m
-            && position.X <= x2 * m
-            && position.Y >= y1 * m
-            && position.Y <= y2 * m;
-    }
-    */
-
     private void SetOrigin(Point origin)
     {
         var delta = BotRight - TopLeft;
@@ -120,16 +104,32 @@ internal class Selection()
         {
             return;
         }
+    }
 
-        TopLeft = new(
-            Math.Min(TopLeft.X, node.Bounds.TopLeft.X),
-            Math.Min(TopLeft.Y, node.Bounds.TopLeft.Y)
-        );
-        BotRight = new(
-            Math.Max(BotRight.X, node.Bounds.BottomRight.X),
-            Math.Max(BotRight.Y, node.Bounds.BottomRight.Y)
-        );
+    public void UpdateBounds()
+    {
+        TopLeft = new Point(int.MaxValue, int.MaxValue);
+        BotRight = new Point(int.MinValue, int.MinValue);
+        foreach (var node in Nodes)
+        {
+            TopLeft = new(
+                Math.Min(TopLeft.X, node.Bounds.TopLeft.X),
+                Math.Min(TopLeft.Y, node.Bounds.TopLeft.Y)
+            );
+            
+            BotRight = new(
+                Math.Max(BotRight.X, node.Bounds.BottomRight.X),
+                Math.Max(BotRight.Y, node.Bounds.BottomRight.Y)
+            );
+        }
         NotityBoundChanged();
+    }
+
+    public void RemoveNode(string id)
+    {
+        var node = Nodes.FirstOrDefault(n => n.Id == id);
+        if (node is null){return;}
+        Nodes.Remove(node);
     }
 
     public void Drag(Point position)

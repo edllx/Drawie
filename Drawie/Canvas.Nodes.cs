@@ -39,7 +39,7 @@ public partial class Canvas
         }
         
         if (!AddN(node, replace: replace)){return;} 
-        Refrech();
+        Refresh();
     }
 
     public void AddNode(IEnumerable<INode> nodes,bool replace =false, bool clear=false)
@@ -64,17 +64,26 @@ public partial class Canvas
             if(_nodes.ContainsKey(node.Id) && ! replace){continue;}
             _nodes[node.Id] = node;
         }
-        Refrech();
+        Refresh();
     }
 
     public void UpdateNode(INode node,bool create=false)
     {
-        Refrech();
+        Refresh();
     }
 
     public void RemoveNode(string id)
     {
-        Refrech();
+        if (!_nodes.Remove(id))
+        {
+           return; 
+        }
+        
+        RemoveNodeLink(link=>link.Source?.Id == id || link.Destination?.Id == id);
+        Selection.RemoveNode(id);
+        Selection.UpdateBounds();
+        
+        Refresh();
     }
 
     public void RemoveNode(Predicate<INode> predicate)
@@ -84,10 +93,12 @@ public partial class Canvas
             if (predicate(node))
             {
                 _nodeLinks.Remove(node.Id);
+                Selection.RemoveNode(node.Id);
             }
         }
         
-        Refrech();
+        Selection.UpdateBounds();
+        Refresh();
     }
 
     public void AddNodeLink(string fromId, string toId, string? id = null)
@@ -97,20 +108,30 @@ public partial class Canvas
 
         if (fromNode is null || toNode is null)
         {
-            Console.WriteLine(":>");
             return;
         }
 
-        var link = new NodeLink(this,src:fromId,des:toId, id:id);
-        _nodeLinks.Add(link.Id, link);
         
-        Refrech();
+        try
+        {
+
+            var link = new NodeLink(this,src:fromId,des:toId, id:id);
+            
+            _nodeLinks.Add(link.Id, link);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+        Refresh();
     }
 
     public void RemoveNodeLink(string id)
     {
         _nodeLinks.Remove(id); 
-        Refrech();
+        Refresh();
     }
 
     public void RemoveNodeLink(Predicate<NodeLink> predicate)
@@ -123,7 +144,7 @@ public partial class Canvas
             }
         }
         
-        Refrech();
+        Refresh();
     }
 
     public INode? GetNodeAt(Point point)
@@ -158,8 +179,7 @@ public partial class Canvas
     {
         foreach (var (key,nl) in _nodeLinks)
         {
-            if(nl.Destination is null || nl.Source is null  ){continue;}
-            
+            if(nl.Destination is null || nl.Source is null || IsNodeOffBound(nl) ){continue;}
             nl.Render(context); 
         }
     }

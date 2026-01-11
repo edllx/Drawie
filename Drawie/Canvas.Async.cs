@@ -1,3 +1,5 @@
+using Avalonia.Threading;
+
 namespace Drawie;
 
 public partial class Canvas
@@ -5,12 +7,13 @@ public partial class Canvas
     private RequestManager RenderManager = new(16);
     private RequestManager MouseManager = new(64);
 
-    public void Refrech()
+    
+    public void Refresh()
     {
         _ = RenderManager.Execute(
             new(async () =>
             {
-                InvalidateVisual();
+                await Dispatcher.UIThread.InvokeAsync(InvalidateVisual);
             })
         );
     }

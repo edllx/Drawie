@@ -110,6 +110,7 @@ internal partial class CanvasPointerEventHandler
                 _canvas.Selection.AddNode(node, adjustBounds: false);
             }
         }
+        
         _canvas.Selection.NotityBoundChanged();
 
         e.Handled = true;
@@ -153,6 +154,7 @@ internal partial class CanvasPointerEventHandler
             _canvas.Selection.BotRight = _canvas.Selection.TopLeft;
         }
         _canvas.Selection.AddNode(nd);
+        _canvas.Selection.UpdateBounds();
 
         e.Handled = true;
         return this;

@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Drawie;
 using Canvas = Avalonia.Controls.Canvas;
 
@@ -15,32 +16,6 @@ public partial class MainWindow : Window
 {
     List<INode> nodes = [];
 
-    private Timer? _timer;
-    
-    public void StartTimer(int intervalMilliseconds)
-    {
-        // Create a timer that calls the method every X milliseconds
-        _timer = new Timer(TimerCallback, null, 0, intervalMilliseconds);
-    }
-    
-    private void TimerCallback(object? state)
-    {
-        // Your task logic here
-        Console.WriteLine($"Task executed at {DateTime.Now}");
-        
-    }
-    
-    private void ProcessData()
-    {
-        // Your task logic
-    }
-    
-    public void StopTimer()
-    {
-        _timer?.Dispose();
-        _timer = null;
-    }
-    
     public MainWindow()
     {
         InitializeComponent();
@@ -61,6 +36,7 @@ public partial class MainWindow : Window
                     Desctiption = "Simple description",
                     Title = "Task 1",
                     Id = $"ID_I{i}_J{j}"
+                    ,Draggable = i%2==0,
                 });
             }
         }
@@ -69,27 +45,17 @@ public partial class MainWindow : Window
         
         canvas.AddNodeLink("ID_I1_J1","ID_I2_J3");
         
-
-        /*
-        AsyncTimer timer = new AsyncTimer(1000, async () =>
-        {
-           var random = Random.Shared.Next(0,nodes.Count); 
-           var node = nodes[random];
-
-           if (node is TaskNode taskNode)
-           {
-               taskNode.Desctiption = $"Random description : {Random.Shared.Next(0,1000)}";
-           }
-        });
-
-        _ = timer.Run();
-
         Task.Run(async () =>
         {
-            await Task.Delay(60000);
-            timer.Stop();
+            await Task.Delay(5000);
+            canvas.RemoveNode("ID_I1_J1");
+            
+            await Task.Delay(1000);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                canvas.AddNodeLink("ID_I0_J1","ID_I2_J3");
+            });
         });
-        */
     }
 
 }

@@ -2,13 +2,13 @@ using System.Text;
 
 namespace Drawie;
 
-public interface ICommand
+internal interface ICommand
 {
     void Execute();
     Task ExecuteAsync();
 }
 
-public class Command(Func<Task> action) : ICommand
+internal class Command(Func<Task> action) : ICommand
 {
     public DateTime CreatedAt { get; init; } = DateTime.Now;
 
@@ -25,21 +25,12 @@ public class Command(Func<Task> action) : ICommand
 
 internal static class IdGenerator
 {
-    private static string _alphaNum = "abcdefghijklmnopkrstuvwxyz0123456789";
+    private static readonly string AlphaNum = "abcdefghijklmnopkrstuvwxyz0123456789";
 
     public static string GenerateRandomString(int len, string prefix = "", int? seed = null)
     {
         StringBuilder builder = new();
-        Random r = new Random();
-
-        if (seed is not null && seed.Value >= 0 && seed.Value <= int.MaxValue)
-        {
-            r = new(seed.Value);
-        }
-        else
-        {
-            r = Random.Shared;
-        }
+        Random r = seed >= 0 ? new(seed.Value) : Random.Shared;
 
         int i = 0;
         for (; i < prefix.Length && i < len; i++)
@@ -49,8 +40,8 @@ internal static class IdGenerator
 
         for (; i < len; i++)
         {
-            var pick = r.Next(_alphaNum.Length);
-            builder.Append(_alphaNum[pick]);
+            var pick = r.Next(AlphaNum.Length);
+            builder.Append(AlphaNum[pick]);
         }
 
         return builder.ToString();
@@ -62,7 +53,7 @@ internal static class IdGenerator
 /// </summary>
 /// <param name="refresh"> delay between each command in (ms)</param>
 /// <remarks>The last command will always get executed</remarks>
-public class RequestManager(int delay)
+internal class RequestManager(int delay)
 {
     private readonly Stack<Command> _commands = [];
     private readonly SemaphoreSlim _commandSem = new(1, 1);

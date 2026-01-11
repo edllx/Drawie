@@ -106,11 +106,11 @@ public class TaskNode : Node
         {
             case nameof(Title):
                 TitleNode.Content = Title;
-                Canvas?.Refrech();
+                Canvas?.Refresh();
                 break;
             case nameof(Desctiption):
                 DescriptionNode.Content = Desctiption;
-                Canvas?.Refrech();
+                Canvas?.Refresh();
                 break;
             case nameof(Selected):
                 Body.Selected = Selected;

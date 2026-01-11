@@ -10,13 +10,13 @@ public class NodeLink : Node
     private List<Point> _points = [];
     public INode? Source { get; init; }
     public INode? Destination { get; init; }
-    private DrawingGroup VertexGroup = new();
-    private IPen Pen = new Pen(Brushes.Red, 2, lineCap: PenLineCap.Round);
+    private DrawingGroup VertexGroup ;
+    //private IPen Pen = new Pen(Brushes.Red, 2, lineCap: PenLineCap.Round);
 
     public NodeLink()
         : base()
     {
-        
+        VertexGroup = new();
         Id = IdGenerator.GenerateRandomString(18, "PT-");
     }
 
@@ -32,6 +32,8 @@ public class NodeLink : Node
         {
             Id = IdGenerator.GenerateRandomString(18, "PT-");
         }
+        
+        VertexGroup = new();
         
         Canvas = canvas;
         Source = Canvas.GetNode(src);
@@ -52,7 +54,6 @@ public class NodeLink : Node
         switch (e.PropertyName)
         {
            case  nameof(INode.Bounds):
-               Console.WriteLine(Bounds);
                Dirty = true;
                break;
         }
@@ -81,10 +82,11 @@ public class NodeLink : Node
 
         Point start = _points[0] ;
 
+        var pen = new Pen(Brushes.Red, 2, lineCap: PenLineCap.Round);
         for (int i = 1; i < _points.Count; i++)
         {
             Point end = _points[i] ;
-            ctx.DrawLine(Pen, start, end);
+            ctx.DrawLine(pen, start, end);
             start = end;
         }
     }

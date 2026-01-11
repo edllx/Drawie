@@ -37,8 +37,6 @@ public partial class Canvas : Control, ICanvas
     public event Action<double>? OnZoomChanged;
     public event Action<Vector>? OnOffsetChanged;
 
-    
-
     private Stopwatch _renderStopwatch = new Stopwatch();
     private Stopwatch _cacheStopwatch = new Stopwatch();
     private long _lastRenderTimeMs = 0;
@@ -73,10 +71,6 @@ public partial class Canvas : Control, ICanvas
     internal Vector PanOffset { get; private set; } = new Vector(0, 0); 
     internal Point LastMousePressedPosition { get; private set; }
 
-    //private readonly List<INode> _nodes = [];
-    //private readonly List<NodeLink> _nodeLinks = [];
-
-
     public Canvas()
     {
         PointerHandler = new(this);
@@ -86,13 +80,12 @@ public partial class Canvas : Control, ICanvas
 
     private void HandleSelectionBoundChange(Point tl, Point br)
     {
-        Refrech();
+        Refresh();
     }
 
     internal bool SetPanOffset(Vector offset)
     {
         PanOffset = offset;
-
         OnOffsetChanged?.Invoke(PanOffset);
         return true;
     }
@@ -137,15 +130,16 @@ public partial class Canvas : Control, ICanvas
         var current = ScreenToWorld(e.GetPosition(this));
         PanOffset += (current - prev);
         UpdateGrid();
-        Refrech();
+        Refresh();
         OnZoomChanged?.Invoke(Zoom);
         e.Handled = true;
+
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         UpdateGrid();
-        Refrech();
+        Refresh();
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -161,7 +155,7 @@ public partial class Canvas : Control, ICanvas
                 if (e.Handled)
                 {
                     UpdateGrid();
-                    Refrech();
+                    Refresh();
                 }
             })
         );
@@ -170,7 +164,7 @@ public partial class Canvas : Control, ICanvas
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         PointerHandler.HandleLeftRelease(e);
-        Refrech();
+        Refresh();
     }
 
     public override void Render(DrawingContext context)
@@ -183,8 +177,8 @@ public partial class Canvas : Control, ICanvas
         using (context.PushTransform(adj))
         {
             DrawGrid(context);
-            DrawNodes(context);
             DrawNodeLinks(context);
+            DrawNodes(context);
             DrawSelection(context);
         }
 
@@ -202,7 +196,7 @@ public partial class Canvas : Control, ICanvas
     private void DrawMetrics(DrawingContext ctx)
     {
         var metrics = new FormattedText(
-            $"Cache: {(_useCache ? "ON" : "OFF")}\n" + $"Render: {_lastRenderTimeMs}ms\n",
+            $"Render Delay: {_lastRenderTimeMs}ms\n",
             CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
             Typeface.Default,
@@ -214,12 +208,12 @@ public partial class Canvas : Control, ICanvas
         ctx.DrawText(metrics, new Point(5, 5));
     }
 
-    public Point ScreenToWorld(Point p)
+    internal Point ScreenToWorld(Point p)
     {
         return (p / Zoom) - PanOffset;
     }
 
-    public Point WorldToScreen(Point p)
+    internal Point WorldToScreen(Point p)
     {
         return (p + PanOffset) * Zoom;
     }
