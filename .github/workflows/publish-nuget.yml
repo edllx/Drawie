@@ -88,8 +88,8 @@ jobs:
 
       - name: Build and Pack
         run: |
-          dotnet build -c Release
-          dotnet pack -c Release -p:PackageVersion=${{ steps.bump_version.outputs.NEW_VERSION }} --output ./nupkg
+          dotnet build -c Release Drawie
+          dotnet pack -c Release -p:PackageId=Edllx.Drawie -p:PackageVersion=${{ steps.bump_version.outputs.NEW_VERSION }} --output ./nupkg Drawie
 
       - name: Publish to NuGet
         run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
