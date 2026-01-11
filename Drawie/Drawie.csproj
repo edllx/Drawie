@@ -5,6 +5,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>canvas</RootNamespace>
+
+    <Title>Drawie</Title>
+    <Authors>Leonyx</Authors>
+    <Description>Interactive canvas built on top of Avalonia UI that enables zooming, panning, selection.
+    </Description>
+    <Copyright>Laurent Etienne 2026</Copyright>
+    <RepositoryUrl>https://github.com/edllx/Drawie</RepositoryUrl>
+    <PackageTags>edllx;</PackageTags>
+    <PackageProjectUrl>https://github.com/edllx/Drawie</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
