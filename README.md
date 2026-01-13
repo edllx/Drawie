@@ -12,7 +12,7 @@ Interactive canvas built on top of Avalonia UI that enables zooming, panning, se
 Via NuGet
 
 ```bash
-dotnet add package eddllx/Drawie
+dotnet add package Edllx.Drawie
 ```
 
 ## 🎮 Documentation
